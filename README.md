@@ -90,16 +90,18 @@ npx @ansvar/danish-data-protection-mcp
 
 ---
 
-## Available Tools (6)
+## Available Tools (8)
 
 | Tool | Description |
 |------|-------------|
-| `dk_dp_search_decisions` | Full-text search across Datatilsynet decisions (afgørelser, sanctions, indskærpelser). Returns matching decisions wit... |
-| `dk_dp_get_decision` | Get a specific Datatilsynet decision by reference number (e.g., |
-| `dk_dp_search_guidelines` | Search Datatilsynet guidance documents: vejledninger, retningslinjer, and FAQs. Covers GDPR implementation, DPIA meth... |
+| `dk_dp_search_decisions` | Full-text search across Datatilsynet decisions (afgørelser, sanctions, indskærpelser). Returns matching decisions with reference, entity name, fine amount, and GDPR articles cited. |
+| `dk_dp_get_decision` | Get a specific Datatilsynet decision by reference number (e.g., `2020-431-0059`). |
+| `dk_dp_search_guidelines` | Search Datatilsynet guidance documents: vejledninger, retningslinjer, and FAQs. Covers GDPR implementation, DPIA methodology, cookie consent, kameraovervågning, and more. |
 | `dk_dp_get_guideline` | Get a specific Datatilsynet guidance document by its database ID. |
 | `dk_dp_list_topics` | List all covered data protection topics with Danish and English names. Use topic IDs to filter decisions and guidelines. |
 | `dk_dp_about` | Return metadata about this MCP server: version, data source, coverage, and tool list. |
+| `dk_dp_list_sources` | List authoritative sources and provenance: URLs, licensing, coverage scope, and freshness metadata. |
+| `dk_dp_check_data_freshness` | Check data freshness for each source. Reports last-updated timestamp, age in days, and staleness status. |
 
 All tools return structured data with source references and timestamps.
 
@@ -117,7 +119,7 @@ All content is sourced from official Danish regulatory publications:
 - Freshness checks run via GitHub Actions workflows
 - Last-updated timestamps in tool responses indicate data age
 
-See `sources.yml` for full provenance metadata.
+See [COVERAGE.md](COVERAGE.md) for full provenance metadata.
 
 ---
 
@@ -180,8 +182,7 @@ npx @anthropic/mcp-inspector node dist/index.js   # Test with MCP Inspector
 ### Data Management
 
 ```bash
-npm run build:db       # Rebuild SQLite database from seed data
-npm run check-updates  # Check for new regulatory data
+npm run ingest         # Crawl Datatilsynet and update the SQLite database
 ```
 
 ---
@@ -218,7 +219,7 @@ Apache License 2.0. See [LICENSE](./LICENSE) for details.
 
 ### Data Licenses
 
-Regulatory data sourced from official government publications. See `sources.yml` for per-source licensing details.
+Regulatory data sourced from official government publications. See [COVERAGE.md](COVERAGE.md) for per-source licensing details.
 
 ---
 
