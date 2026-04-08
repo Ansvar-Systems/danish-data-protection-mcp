@@ -1,9 +1,9 @@
 /**
- * SQLite database access layer for the CNIL MCP server.
+ * SQLite database access layer for the Datatilsynet MCP server.
  *
  * Schema:
- *   - decisions    — CNIL deliberations, sanctions, and mises en demeure
- *   - guidelines   — CNIL guidance documents, recommandations, and referentiels
+ *   - decisions    — Datatilsynet afgørelser, sanctions, and indskærpelser
+ *   - guidelines   — Datatilsynet vejledninger, retningslinjer, and FAQs
  *   - topics       — controlled vocabulary for data protection topics
  *
  * FTS5 virtual tables back full-text search on decisions and guidelines.

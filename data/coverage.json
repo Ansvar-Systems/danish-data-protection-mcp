@@ -1,0 +1,33 @@
+{
+  "server": "danish-data-protection-mcp",
+  "version": "0.1.0",
+  "jurisdiction": "DK",
+  "sources": [
+    {
+      "id": "datatilsynet",
+      "name": "Datatilsynet (Danish Data Protection Authority)",
+      "url": "https://www.datatilsynet.dk/",
+      "type": "regulatory_authority",
+      "jurisdiction": "DK",
+      "language": "da",
+      "license": "Open Government Data",
+      "coverage": {
+        "decisions": ["afgørelse", "sanction", "indskærpelse", "udtalelse"],
+        "guidelines": ["vejledning", "retningslinje", "FAQ"]
+      }
+    }
+  ],
+  "tools": 8,
+  "tool_prefix": "dk_dp_",
+  "topics": [
+    "cookies",
+    "samtykke",
+    "ansættelsesforhold",
+    "kameraovervågning",
+    "sundhedsdata",
+    "dataoverfoersler",
+    "konsekvensanalyse",
+    "registerindsigt",
+    "børn"
+  ]
+}
