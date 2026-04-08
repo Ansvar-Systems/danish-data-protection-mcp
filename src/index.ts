@@ -15,7 +15,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
@@ -42,6 +42,20 @@ try {
 }
 
 const SERVER_NAME = "danish-data-protection-mcp";
+const SOURCE_URL = "https://www.datatilsynet.dk/";
+const DISCLAIMER =
+  "This data is sourced from official Datatilsynet publications and is provided for research purposes only. Not legal or regulatory advice. Verify all references against primary sources before making compliance decisions.";
+const COPYRIGHT =
+  "© Datatilsynet (Danish Data Protection Authority). Data used under open government license.";
+
+function getDbMtime(): string {
+  const dbPath = process.env["DT_DB_PATH"] ?? "data/datatilsynet.db";
+  try {
+    return statSync(dbPath).mtime.toISOString();
+  } catch {
+    return new Date(0).toISOString();
+  }
+}
 
 // --- Tool definitions ---------------------------------------------------------
 
@@ -151,6 +165,26 @@ const TOOLS = [
       required: [],
     },
   },
+  {
+    name: "dk_dp_list_sources",
+    description:
+      "List authoritative sources and provenance used by this MCP server. Returns data source URLs, licensing, coverage scope, and freshness metadata.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    name: "dk_dp_check_data_freshness",
+    description:
+      "Check data freshness for each source. Reports last-updated timestamps, staleness status, and provides update instructions.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {},
+      required: [],
+    },
+  },
 ];
 
 // --- Zod schemas for argument validation --------------------------------------
@@ -180,9 +214,21 @@ const GetGuidelineArgs = z.object({
 // --- Helper ------------------------------------------------------------------
 
 function textContent(data: unknown) {
+  const payload =
+    data !== null && typeof data === "object" && !Array.isArray(data)
+      ? {
+          ...(data as Record<string, unknown>),
+          _meta: {
+            disclaimer: DISCLAIMER,
+            source_url: SOURCE_URL,
+            copyright: COPYRIGHT,
+            data_age: getDbMtime(),
+          },
+        }
+      : data;
   return {
     content: [
-      { type: "text" as const, text: JSON.stringify(data, null, 2) },
+      { type: "text" as const, text: JSON.stringify(payload, null, 2) },
     ],
   };
 }
@@ -281,13 +327,52 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           version: pkgVersion,
           description:
             "Datatilsynet (Danish Data Protection Authority) MCP server. Provides access to Danish data protection authority decisions, sanctions, afgørelser, and official guidance documents.",
-          data_source: "Datatilsynet (https://www.datatilsynet.dk/)",
+          data_source: SOURCE_URL,
           coverage: {
             decisions: "Datatilsynet afgørelser, sanctions, and indskærpelser",
             guidelines: "Datatilsynet vejledninger, retningslinjer, and FAQs",
             topics: "Cookies, ansættelsesforhold, samtykke, kameraovervågning, sundhedsdata, dataoverførsler, konsekvensanalyse, registerindsigt, børn",
           },
           tools: TOOLS.map((t) => ({ name: t.name, description: t.description })),
+        });
+      }
+
+      case "dk_dp_list_sources": {
+        return textContent({
+          sources: [
+            {
+              id: "datatilsynet",
+              name: "Datatilsynet (Danish Data Protection Authority)",
+              url: SOURCE_URL,
+              type: "regulatory_authority",
+              jurisdiction: "DK",
+              language: "da",
+              license: "Open Government Data",
+              coverage: "Decisions (afgørelser, sanctions, indskærpelser) and guidance (vejledninger, retningslinjer, FAQs)",
+              last_updated: getDbMtime(),
+            },
+          ],
+        });
+      }
+
+      case "dk_dp_check_data_freshness": {
+        const dbPath = process.env["DT_DB_PATH"] ?? "data/datatilsynet.db";
+        const lastUpdated = getDbMtime();
+        const ageMs = Date.now() - new Date(lastUpdated).getTime();
+        const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
+        const status = ageDays > 7 ? "stale" : ageDays >= 0 ? "ok" : "unknown";
+        return textContent({
+          sources: [
+            {
+              id: "datatilsynet",
+              name: "Datatilsynet",
+              db_path: dbPath,
+              last_updated: lastUpdated,
+              age_days: ageDays,
+              status,
+              update_command: "npm run ingest",
+            },
+          ],
         });
       }
 
