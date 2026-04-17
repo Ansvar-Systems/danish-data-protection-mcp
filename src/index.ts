@@ -217,7 +217,7 @@ function textContent(data: unknown) {
   const payload =
     data !== null && typeof data === "object" && !Array.isArray(data)
       ? {
-          ...(data as Record<string, unknown>),
+          ...(data as unknown as Record<string, unknown>),
           _meta: {
             disclaimer: DISCLAIMER,
             source_url: SOURCE_URL,
@@ -273,7 +273,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!decision) {
           return errorContent(`Decision not found: ${parsed.reference}`);
         }
-        const dec = decision as Record<string, unknown>;
+        const dec = decision as unknown as Record<string, unknown>;
         return textContent({
           ...dec,
           _citation: buildCitation(
@@ -303,7 +303,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!guideline) {
           return errorContent(`Guideline not found: id=${parsed.id}`);
         }
-        const gl = guideline as Record<string, unknown>;
+        const gl = guideline as unknown as Record<string, unknown>;
         return textContent({
           ...gl,
           _citation: buildCitation(
