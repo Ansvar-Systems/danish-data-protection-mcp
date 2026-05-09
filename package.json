@@ -2,11 +2,11 @@
   "name": "@ansvar/danish-data-protection-mcp",
   "version": "0.1.0",
   "mcpName": "eu.ansvar/danish-data-protection-mcp",
-  "description": "Datatilsynet (Danish data protection authority) MCP server — decisions, sanctions, and guidance on GDPR enforcement in Denmark",
+  "description": "Datatilsynet (Danish data protection authority) MCP server \u2014 decisions, sanctions, and guidance on GDPR enforcement in Denmark",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "bin": {
-    "danish-data-protection-mcp": "dist/src/index.js"
+    "danish-data-protection-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -41,11 +41,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/http-server.ts",
-    "start": "node dist/src/http-server.js",
+    "start": "node dist/http-server.js",
     "seed": "npx tsx scripts/seed-sample.ts",
-    "ingest": "npx tsx scripts/ingest-datatilsynet.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:contract": "echo \"No contract tests yet\" && exit 0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
